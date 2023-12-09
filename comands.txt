@@ -1,0 +1,3 @@
+kubectl rollout restart deployment <nome-do-seu-deployment> -n <seu-namespace>
+
+kubectl rollout restart deployment nginx-deployment-develop -n develop
