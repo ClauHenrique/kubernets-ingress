@@ -2,7 +2,68 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: develop
+
 ---
+# backend
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: develop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: xicoxavier/back-develop
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: develop
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-api-develop
+  namespace: develop
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.192.168.49.2.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backend
+            port:
+              number: 3000
+
+---
+# frontend
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,7 +75,7 @@ spec:
   selector:
     matchLabels:
       app: front-end-develop
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -22,10 +83,12 @@ spec:
     spec:
       containers:
        - name: nginx
-         image: xicoxavier/front-nginx
+         image: xicoxavier/front-develop
          ports:
          - containerPort: 80
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -38,7 +101,9 @@ spec:
   ports:
   - port: 80
     targetPort: 80
+
 ---
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
