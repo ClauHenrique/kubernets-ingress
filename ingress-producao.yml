@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: producao
+
+---
+# backend
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-producao-deploy
+  namespace: producao
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-producao
+  template:
+    metadata:
+      labels:
+        app: backend-producao
+    spec:
+      containers:
+      - name: backend-producao
+        image: xicoxavier/back-producao
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-producao-service
+  namespace: producao
+spec:
+  selector:
+    app: backend-producao
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-producao-ingress
+  namespace: producao
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.producao.192.168.49.2.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-producao-service
+            port:
+              number: 3000
+
+---
+# frontend
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-producao-deploy
+  namespace: producao
+  labels:
+    app: front-producao
+spec:
+  selector:
+    matchLabels:
+      app: front-producao
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: front-producao
+    spec:
+      containers:
+       - name: front-producao
+         image: xicoxavier/front-producao
+         ports:
+         - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-producao-service
+  namespace: producao
+spec:
+  type: ClusterIP
+  selector:
+    app: front-producao
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: front-producao-ingress
+  namespace: producao
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: producao.192.168.49.2.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: front-producao-service
+            port:
+              number: 80
