@@ -50,7 +50,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: api.producao.192.168.49.2.nip.io
+  - host: api.producao.10.49.10.42.nip.io
     http:
       paths:
       - path: /
@@ -112,7 +112,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: producao.192.168.49.2.nip.io
+  - host: producao.10.49.10.42.nip.io
     http:
       paths:
       - path: /
